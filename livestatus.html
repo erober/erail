@@ -1,0 +1,132 @@
+
+
+<!DOCTYPE html> 
+<html>
+    <head>
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+            <link rel="icon" href="https://cdn4.iconfinder.com/data/icons/mobile-device/512/train-metropolitan-railways-form-2-512.png">
+            <!-- jQuery library -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+            
+            <!-- Latest compiled JavaScript -->
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+            <style>
+                .total{
+                    align-content: center;
+                    align-items: center;
+                    text-align: center;
+                    margin-top: 20px;
+
+                }
+                .livestatus{
+                    font-size: 30px;
+                    font-family: Arial, Helvetica, sans-serif;
+                    
+                }
+            </style>
+            
+    </head>
+    <body style="background-color: rgb(125, 177, 177)" >
+
+            <nav class="navbar navbar-inverse">
+                    <div class="container-fluid">
+                      <div class="navbar-header">
+                        <a class="navbar-brand" href="#">Train Info</a>
+                      </div>
+                      <ul class="nav navbar-nav">
+                          <li class="active" href="index.html"><a href="index.html">HOME</a></li>
+                          <li><a href="tbs.html">GET TRAINS</a></li>
+                          <li><a href="pnrpage.html">PNR STATUS</a></li>
+                          <li><a href="livestatus.htnml">LIVE STATUS</a></li>
+                      </ul>
+                    </div>
+                  </nav>
+    <div class="total">
+                 
+                   <b>FROM: </b> 
+                    <input type="text"  value="" id="from" aling="center"><br><br>
+                    <b>TO: </b>  
+                    <input type="text"  value="" id="to" aling="center"><br><br>
+                   <b> DATE:  </b>
+                    <input type="date"  value="" id="date" aling="center"><br><br>
+                  <b>TRAIN No:</b> 
+                   <input type="number" id="trainno">
+                    <br><BR>
+                        <button onclick=live()>GET LIVE STATUS</button>
+                        </div>
+                  <p></p>
+                  <br>
+                  <br>
+                  <div>
+                        <ul id="livestatus">
+                             
+                        </ul>
+                        </div>           
+                  
+    
+     <script>
+  
+            var to = document.getElementById("to").value;
+            var from = document.getElementById("from");
+            var date = document.getElementById("date");
+            var trainno = document.getElementById("trainno");
+            var ab =document.getElementById("inp");
+           // console.log(to);
+            console.log("xvnbcham");
+            function live(){
+
+                to = document.getElementById("to").value;
+                from = document.getElementById("from").value;
+                date = document.getElementById("date").value;
+               trainno = document.getElementById("trainno").value;
+               console.log(to);
+               console.log(from);
+               console.log(date);
+               console.log(trainno);
+              
+                //4503661923
+                var dat= date.split("-");
+                            var d=dat[2]+"-"+dat[1]+"-"+dat[0];
+                      var url ="https://api.railwayapi.com/v2/live/train/" + trainno + "/station/" +to+ "/date/"+d+"/apikey/x5ca0cxi5x/";
+                                      
+                        console.log(url);
+                let xhr = new XMLHttpRequest;
+                        xhr.addEventListener('load', function(){
+                            var  response = JSON.parse(this.responseText)
+                            console.log(response);
+                          console.log(response.position);
+                          //  console.log(this.responseText);
+                            //console.log(response.status.latemin);
+
+                            var it=document.createElement("li");
+                  it.innerHTML=`
+               POSITION OF TRAIN  :${response.position}<br>
+  
+            `
+           
+            var pos=document.getElementById("livestatus");
+            pos.insertBefore(it,pos.childNodes[0]);
+
+
+
+                        
+                       
+            })
+            var dat= date.split("-");
+                           var d=dat[2]+"-"+dat[1]+"-"+dat[0];
+                      var url ="https://api.railwayapi.com/v2/live/train/" + trainno + "/station/" + to + "/date/"+d+"/apikey/x5ca0cxi5x/";
+                                      
+                        console.log(url);
+                       // console.log(response.value);
+                        xhr.open('GET', url )
+                        xhr.send();
+            }
+            
+            </script>
+
+    </body>
+    
+   
+
+
+</html>
