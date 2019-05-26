@@ -1,0 +1,173 @@
+<!DOCTYPE html> 
+<html>
+    <head>
+            
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+            <link rel="icon" href="https://cdn4.iconfinder.com/data/icons/mobile-device/512/train-metropolitan-railways-form-2-512.png">
+            <!-- jQuery library -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+            <!-- Latest compiled JavaScript -->
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+            
+            <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+            <!--<script src="app.js"></script>-->
+            <title>Get Trains</title>
+            <style>
+            body {
+              background-color: rgb(125, 177, 177);
+            }
+            
+            .search{
+              text-align: center;
+            }
+            .search-title{
+              text-align: center;
+              padding-top: 10px;
+              padding-bottom: 10px;
+            }
+            .search-result{
+              text-align: center;
+            }
+            .row {
+              text-align: center;
+            }
+            </style>
+
+    </head>
+    <body>
+
+            <nav class="navbar navbar-inverse">
+                    <div class="container-fluid">
+                      <div class="navbar-header">
+                        <a class="navbar-brand" href="#">Train Info</a>
+                      </div>
+                      <ul class="nav navbar-nav">
+                        <li class="active"><a href="index.html">HOME</a></li>
+                        <li><a href="tbs.html">GET TRAINS</a></li>
+                        <li><a href="pnrpage.html">PNR STATUS</a></li>
+                        <li><a href="livestatus.html">LIVE STATUS</a></li>
+                      </ul>
+                    </div>
+                  </nav>
+
+                  
+                  <div class="search">
+                  <form action="#" method="GET" onsubmit="return false">
+                    
+                    <h5 style="color: solid black "><b>FROM:</b></h5> 
+                    <input type="text" name="from" id="from" placeholder="Source">
+                    <br>
+                    <h5 style="color: solid black "><b>TO:</b></h5>
+                    <input type="text" name="to" id="to" placeholder="Destination"><br>
+                    <h5 style="color: solid black "><b>DATE:</b></h5>
+                    <input type="date" name="date" id="date"><br>
+                    <h5 style="color: solid black "><b>CLASS:</b></h5>
+                    <select>
+                        <option id="option">SLEEPER</option>
+                        <option id="option">AC</option>
+                        <option id="option">GENERAL</option>
+                    </select>
+                    <br>
+                    <br>
+                    <button onclick= fun() >Submit</button>
+                    <br>
+                  </form> 
+                </div> 
+                
+                <div class="search-title">
+                <h4 style="color: solid black "><b><i>Search Results</i></b></h4>
+                </div>
+                
+                <!--Search results-->
+                  <div calss="search-result" id="train">
+                     </div>
+                  
+    </body>
+
+    <script>
+      var dtToday = new Date();
+    
+      var month = dtToday.getMonth() + 1;
+      var day = dtToday.getDate();
+      var year = dtToday.getFullYear();
+      if(month < 10)
+        month = '0' + month.toString();
+      if(day < 10)
+        day = '0' + day.toString();
+    
+      var minDate = year + '-' + month + '-' + day;
+      document.getElementById('date').setAttribute('min', minDate)
+    
+      function fun() {
+                var from = document.getElementById('from').value;
+                var to = document.getElementById('to').value; 
+                var date = document.getElementById('date').value;
+                var clas = document.getElementById('option').value;
+          //checking if data is found 
+          console.log('Printing from input');
+          console.log(from);
+          console.log(to);
+          console.log(date);
+
+      //Making a promise
+      var train = new Promise ( (response,reject) => {
+           let source = from;
+           let dest = to;
+           let doj=date;
+           var stations = [source,dest,doj];
+           if(source&&dest&&doj)
+           {
+             response(stations);
+           }
+           else
+           {
+             alert('Input Incomplete');
+             reject('Input is empty');
+           }
+      
+          }).then (function(stations)
+          { 
+            console.log('printing from stored array')
+            console.log(stations[0],stations[1]);
+            var train_nav=document.getElementById('train');
+            var xhr_train = new XMLHttpRequest;
+            xhr_train.onreadystatechange = function () {
+              if(this.readyState == 4 && this.status == 200)
+              {
+                var obj = JSON.parse(this.responseText)
+                console.log(obj.trains);
+                train_nav.innerHTML= ' ';
+                if(obj.total)
+                { console.log('Train available');
+                  for(let i=0;i<obj.total;i++)
+                  {
+                  train_nav.innerHTML+='<div class="row" style=" background-color: white; margin: 20px auto; "> <div class="col-lg-3"> <p><b>'+ obj.trains[i].number +'</b></p> <p><b>'+ obj.trains[i].name +'</b></p> </div> <div class="col-lg-6"> <div class="row"> <div class="col-lg-4" align="center"><p><b>Departure</b></p><p>'+ obj.trains[i].src_departure_time +'</p></div> <div class="col-lg-4" align="center"><p><b>Travel Time</b></p> '+ obj.trains[i].travel_time +'</p> </div> <div class="col-lg-4" align="center"> <p><b>Arrival</b></p><p>'+ obj.trains[i].dest_arrival_time +'</p></div> </div> </div> </div>';
+                   }
+                }
+                else{
+                  train_nav.innerHTML = '<h4><i>No trains found </i></h4>' ;
+                }
+              }
+            } ;
+          
+                let dat= stations[2].split("-");
+                var d=dat[2]+"-"+dat[1]+"-"+dat[0];
+                /*console.log(from);
+                console.log(to);*/
+                console.log(d);
+            var url= "https://api.railwayapi.com/v2/between/source/"+from+"/dest/"+to+"/date/"+d+"/apikey/x5ca0cxi5x" ;                
+            console.log(url);
+            xhr_train.open('GET', url )
+            xhr_train.send();
+          
+          }).catch ((err) => {
+            console.log(err);
+          } );
+         }
+            //console.log(from.value);
+            //console.log(date.value);
+                
+                
+                        
+    </script>
+</html>
